@@ -86,7 +86,6 @@ const lastSnapshotAtMs = new WeakMap<HTMLVideoElement, number>();
 function maybeSnapshotVideoFrame(video: HTMLVideoElement): void {
   if (
     video.readyState < 2 ||
-    video.seeking ||
     video.videoWidth <= 0 ||
     video.videoHeight <= 0
   ) {
@@ -94,7 +93,7 @@ function maybeSnapshotVideoFrame(video: HTMLVideoElement): void {
   }
   const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
   const prevMs = lastSnapshotAtMs.get(video) ?? 0;
-  if (!video.paused && now - prevMs < 140) {
+  if (!video.paused && !video.seeking && now - prevMs < 140) {
     return;
   }
   lastSnapshotAtMs.set(video, now);
@@ -128,20 +127,20 @@ function resolveVideoDrawable(
   video: HTMLVideoElement,
   skipSnapshotCache = false,
 ): HTMLVideoElement | HTMLCanvasElement | undefined {
-  if (!video.seeking && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-    if (!skipSnapshotCache) {
-      maybeSnapshotVideoFrame(video);
-    }
-    return video;
+  if (!skipSnapshotCache) {
+    maybeSnapshotVideoFrame(video);
   }
   const cached = lastDecodedVideoFrameCache.get(video);
+  if (!video.seeking && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+    return video;
+  }
   if (cached && cached.width > 0 && cached.height > 0) {
     return cached;
   }
   if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
     return video;
   }
-  return undefined;
+  return cached || undefined;
 }
 
 function drawClipVisual(
@@ -1132,8 +1131,8 @@ export async function syncVideoElementsForTime(
       ovVideo,
       computeMediaOverlaySourceTime(overlay, timelineTime),
       1,
-      true,
-      0,
+      Boolean(overlay.muted),
+      overlay.volume ?? 1,
       true,
     );
   }

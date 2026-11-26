@@ -139,6 +139,8 @@ export interface MediaOverlay {
   spinEnabled: boolean;
   spinSpeed?: number; // 0.5..3
   spinDirection?: 'cw' | 'ccw';
+  muted?: boolean;
+  volume?: number;
   chromaKey: MediaOverlayChromaKey;
 }
 

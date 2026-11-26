@@ -318,6 +318,7 @@ async function renderMixedOfflineAudioBuffer(
   assetsById: Map<string, MediaAsset>,
   audioTracks: AudioTrackItem[],
   totalDuration: number,
+  mediaOverlays: MediaOverlay[] = [],
 ): Promise<AudioBuffer | null> {
   if (typeof OfflineAudioContext === 'undefined') return null;
 
@@ -327,8 +328,16 @@ async function renderMixedOfflineAudioBuffer(
     const asset = assetsById.get(seg.clip.assetId);
     return asset?.kind === 'video' && !seg.clip.muted && seg.clip.volume > 0;
   });
+  const unmutedMediaOverlays = mediaOverlays.filter((ov) => {
+    const asset = assetsById.get(ov.assetId);
+    return ov.kind === 'video' && asset?.kind === 'video' && !ov.muted && (ov.volume ?? 1) > 0;
+  });
 
-  if (activeAudioTracks.length === 0 && unmutedVideoSegments.length === 0) {
+  if (
+    activeAudioTracks.length === 0 &&
+    unmutedVideoSegments.length === 0 &&
+    unmutedMediaOverlays.length === 0
+  ) {
     return null;
   }
 
@@ -369,6 +378,27 @@ async function renderMixedOfflineAudioBuffer(
     const sourceSpan = Math.min(maxPlayable, seg.duration * seg.clip.speed);
     source.start(seg.startTime, offset, sourceSpan);
     hasAnySource = true;
+  }
+
+  for (const ov of unmutedMediaOverlays) {
+    const asset = assetsById.get(ov.assetId);
+    if (!asset) continue;
+    const buffer = await decodeAudioSrcToBuffer(asset.src, offlineCtx);
+    if (!buffer || buffer.duration <= 0.05) continue;
+    const gain = offlineCtx.createGain();
+    gain.gain.value = clamp(ov.volume ?? 1, 0, 1);
+    gain.connect(offlineCtx.destination);
+
+    let elapsedSpan = 0;
+    while (elapsedSpan < ov.duration) {
+      const chunkDur = Math.min(buffer.duration, ov.duration - elapsedSpan);
+      const source = offlineCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(gain);
+      source.start(ov.startTime + elapsedSpan, 0, chunkDur);
+      elapsedSpan += buffer.duration;
+      hasAnySource = true;
+    }
   }
 
   if (!hasAnySource) return null;

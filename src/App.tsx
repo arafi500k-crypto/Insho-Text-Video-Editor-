@@ -53,6 +53,7 @@ import {
   MIN_CLIP_TRIM_DURATION,
   clamp,
   computeClipSegments,
+  computeMediaOverlaySourceTime,
   deriveTimelineTimeFromVideo,
   findActiveSegmentAtTime,
   getTotalTimelineDuration,
@@ -487,6 +488,36 @@ export default function App() {
 
       liveTimeRef.current = nextTime;
 
+      for (const ov of mediaOverlays) {
+        if (
+          ov.kind === 'video' &&
+          nextTime >= ov.startTime &&
+          nextTime <= ov.startTime + ov.duration
+        ) {
+          const ovAsset = assetsById.get(ov.assetId);
+          if (ovAsset) {
+            const ovVideo = getOrCreateVideoElement(`overlay:${ov.id}`, ovAsset.src);
+            const targetSrcTime = computeMediaOverlaySourceTime(ov, nextTime);
+            ovVideo.loop = true;
+            ovVideo.muted = Boolean(ov.muted);
+            ovVideo.volume = clamp(ov.volume ?? 1, 0, 1);
+            if (Math.abs(ovVideo.currentTime - targetSrcTime) > 0.35 && !ovVideo.seeking) {
+              try {
+                ovVideo.currentTime = targetSrcTime;
+              } catch {
+                // ignore
+              }
+            }
+            if (ovVideo.paused) {
+              ovVideo.play().catch(() => {
+                ovVideo.muted = true;
+                ovVideo.play().catch(() => {});
+              });
+            }
+          }
+        }
+      }
+
       if (looped) {
         void syncVideoElementsForTime(clips, assetsById, 0, true, mediaOverlays);
         lastUiSyncMs = now;
@@ -829,6 +860,8 @@ export default function App() {
       spinEnabled: false,
       spinSpeed: 1,
       spinDirection: 'cw',
+      muted: asset.kind === 'video' ? false : undefined,
+      volume: asset.kind === 'video' ? 1 : undefined,
       chromaKey: { ...DEFAULT_CHROMA_KEY },
     };
     setMediaOverlays((prev) => [...prev, newOv]);
@@ -875,6 +908,8 @@ export default function App() {
             spinEnabled: false,
             spinSpeed: 1,
             spinDirection: 'cw',
+            muted: asset.kind === 'video' ? false : undefined,
+            volume: asset.kind === 'video' ? 1 : undefined,
             chromaKey: { ...DEFAULT_CHROMA_KEY },
           };
         });

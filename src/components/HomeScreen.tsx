@@ -70,33 +70,11 @@ export function HomeScreen({
           </button>
 
           <div className="flex items-center gap-2 min-w-0">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 64 64"
-              aria-hidden="true"
-              className="shrink-0 rounded-md"
-            >
-              <defs>
-                <linearGradient id="insho-home-grad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#ec4899" />
-                  <stop offset="100%" stopColor="#8b5cf6" />
-                </linearGradient>
-              </defs>
-              <rect width="64" height="64" rx="16" fill="#121218" />
-              <rect
-                x="2"
-                y="2"
-                width="60"
-                height="60"
-                rx="14"
-                fill="none"
-                stroke="url(#insho-home-grad)"
-                strokeWidth="3.5"
-              />
-              <path d="M20 20h24v6H35v18h-6V26h-9z" fill="#ffffff" />
-              <circle cx="46" cy="43" r="4" fill="#ec4899" />
-            </svg>
+            <img
+              src="/assets/aistudio/f7d23a18-1001-41d3-98ba-e6c030dcc218_28c615c6.png"
+              alt="Insho Text Logo"
+              className="w-7 h-7 rounded-lg object-cover shadow-sm shrink-0"
+            />
             <span className="font-display font-bold text-sm sm:text-base tracking-tight text-white truncate">
               Insho Text
             </span>
