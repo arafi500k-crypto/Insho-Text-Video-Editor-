@@ -73,6 +73,8 @@ export function HomeScreen({
             <img
               src="/assets/aistudio/f7d23a18-1001-41d3-98ba-e6c030dcc218_28c615c6.png"
               alt="Insho Text Logo"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
               className="w-7 h-7 rounded-lg object-cover shadow-sm shrink-0"
             />
             <span className="font-display font-bold text-sm sm:text-base tracking-tight text-white truncate">
@@ -215,6 +217,8 @@ export function HomeScreen({
                           <img
                             src={draft.thumbnail}
                             alt={draft.title}
+                            draggable="false"
+                            onContextMenu={(e) => e.preventDefault()}
                             className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform"
                           />
                         ) : (
@@ -298,6 +302,8 @@ export function HomeScreen({
                             <img
                               src={draft.thumbnail}
                               alt={draft.title}
+                              draggable="false"
+                              onContextMenu={(e) => e.preventDefault()}
                               className="w-full h-full object-cover"
                             />
                           ) : (

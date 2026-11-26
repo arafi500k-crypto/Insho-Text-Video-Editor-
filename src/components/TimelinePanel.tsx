@@ -856,6 +856,8 @@ export function TimelinePanel({
                               src={thumb}
                               alt={seg.clip.label}
                               referrerPolicy="no-referrer"
+                              draggable="false"
+                              onContextMenu={(e) => e.preventDefault()}
                               className="absolute inset-0 w-full h-full object-cover opacity-55 pointer-events-none"
                             />
                           )}
@@ -1009,6 +1011,8 @@ export function TimelinePanel({
                                 <img
                                   src={thumb}
                                   alt=""
+                                  draggable="false"
+                                  onContextMenu={(e) => e.preventDefault()}
                                   className="w-4 h-4 rounded-sm object-cover shrink-0 border border-white/20"
                                 />
                               )}

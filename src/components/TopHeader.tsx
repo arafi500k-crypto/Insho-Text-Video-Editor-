@@ -40,6 +40,8 @@ export function TopHeader({
         <img
           src="/assets/aistudio/f7d23a18-1001-41d3-98ba-e6c030dcc218_28c615c6.png"
           alt="Insho Text Logo"
+          draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
           className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover shadow-sm shrink-0"
         />
         <span className="font-display font-bold text-sm sm:text-lg tracking-tight text-white whitespace-nowrap truncate">

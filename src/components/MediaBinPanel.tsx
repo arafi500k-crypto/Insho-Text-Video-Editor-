@@ -90,6 +90,8 @@ export function MediaBinPanel({
                     src={asset.thumbnails[0]}
                     alt={asset.name}
                     referrerPolicy="no-referrer"
+                    draggable="false"
+                    onContextMenu={(e) => e.preventDefault()}
                     className="w-full h-full object-cover"
                   />
                 ) : (
