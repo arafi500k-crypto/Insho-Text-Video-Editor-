@@ -1,0 +1,6 @@
+{
+  "name": "Insho Text",
+  "description": "Mobile-first dark-theme video editor with multi-clip timeline, trimming, text overlays, audio mixing, filters, transitions, and 720p/1080p export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
